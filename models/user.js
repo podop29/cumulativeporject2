@@ -36,10 +36,12 @@ class User {
     );
 
     const user = result.rows[0];
+    console.log(user)
 
     if (user) {
       // compare hashed password to a new hash from password
       const isValid = await bcrypt.compare(password, user.password);
+
       if (isValid === true) {
         delete user.password;
         return user;
