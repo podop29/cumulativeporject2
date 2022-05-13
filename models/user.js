@@ -7,6 +7,7 @@ const {
   NotFoundError,
   BadRequestError,
   UnauthorizedError,
+  ExpressError,
 } = require("../expressError");
 
 const { BCRYPT_WORK_FACTOR } = require("../config.js");
@@ -113,6 +114,7 @@ class User {
            FROM users
            ORDER BY username`,
     );
+   
 
     return result.rows;
   }
@@ -138,10 +140,25 @@ class User {
     );
 
     const user = userRes.rows[0];
+    
 
     if (!user) throw new NotFoundError(`No user: ${username}`);
 
     return user;
+  }
+
+
+
+  /**Get jobs for username */
+  static async getJobsFor(username){
+    //querys all jobs attached to a name and returns them
+    const jobs = await db.query(`
+    SELECT * from applications 
+    WHERE username = $1
+    `,[username])
+    console.log(jobs.rows)
+    return jobs.rows;
+
   }
 
   /** Update user data with `data`.
@@ -205,6 +222,38 @@ class User {
     const user = result.rows[0];
 
     if (!user) throw new NotFoundError(`No user: ${username}`);
+  }
+
+
+
+
+  /**let user apply for a job 
+   * Creates new application and adds it to job
+  */
+
+  static async apply(username,jobId){
+    //Check for dup
+    let dup = await db.query(`
+    SELECT * from applications where
+    username = $1 AND job_id = $2
+    `,[username,jobId])
+    //if dup throw error
+    if(dup.rows[0]){
+      throw new BadRequestError("duplicate applications")
+    }
+    //create new application
+    let results = await db.query(`
+    INSERT INTO applications 
+    (username,job_id)
+    values ($1,$2)
+    returning username,job_id
+    `,[username, jobId])
+    const application = results.rows[0]
+    //error if no application
+    if(!application){
+      throw new NotFoundError("Application Failed")
+    }
+    return application
   }
 }
 

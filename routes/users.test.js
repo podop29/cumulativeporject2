@@ -328,3 +328,23 @@ describe("DELETE /users/:username", function () {
   });
 });
 
+
+/**Apply */
+
+describe("Apply for jobs", ()=>{
+  test("works", async ()=>{
+    const id = await db.query(`SELECT id from jobs where title = 'TestJob'
+    `)
+    let idn = id.rows[0].id
+    const resp = await request(app)
+    .post(`/users/u1/jobs/${idn}`)
+    .set("authorization", `Bearer ${adminToken}`);
+    expect(resp.body).toEqual({
+      application:{
+        job_id: idn,
+        username: "u1"
+      }
+    });
+  })
+})
+

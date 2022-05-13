@@ -8,6 +8,8 @@ const express = require("express");
 const { BadRequestError, ExpressError } = require("../expressError");
 const { ensureLoggedIn, ensureAdmin, ensureCorrectUserOrAdmin } = require("../middleware/auth");
 const Company = require("../models/company");
+const Job = require("../models/jobs");
+
 
 const companyNewSchema = require("../schemas/companyNew.json");
 const companyUpdateSchema = require("../schemas/companyUpdate.json");
@@ -22,7 +24,7 @@ const router = new express.Router();
  *
  * Returns { handle, name, description, numEmployees, logoUrl }
  *
- * Authorization required: login
+ * Authorization required: admin
  */
 
 router.post("/", ensureAdmin, async function (req, res, next) {
@@ -85,7 +87,8 @@ router.get("/", async function (req, res, next) {
 router.get("/:handle", async function (req, res, next) {
   try {
     const company = await Company.get(req.params.handle);
-    return res.json({ company });
+    const jobs = await Job.getJobsFor(req.params.handle)
+    return res.json({ company, jobs });
   } catch (err) {
     return next(err);
   }

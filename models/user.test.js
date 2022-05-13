@@ -7,12 +7,15 @@ const {
 } = require("../expressError");
 const db = require("../db.js");
 const User = require("./user.js");
+const Job = require("./jobs.js");
+
 const {
   commonBeforeAll,
   commonBeforeEach,
   commonAfterEach,
   commonAfterAll,
 } = require("./_testCommon");
+
 
 beforeAll(commonBeforeAll);
 beforeEach(commonBeforeEach);
@@ -228,3 +231,22 @@ describe("remove", function () {
     }
   });
 });
+
+
+
+/**apply */
+
+describe("Apply for a job", ()=>{
+  test("works", async ()=>{
+    const id = await db.query(`SELECT id from jobs where title = 'TestJob'
+    `)
+    let idn = id.rows[0].id
+    const application = await User.apply("u1", idn)
+    expect(application).toEqual({
+      job_id: idn,
+      username: 'u1'
+    })
+
+
+  })
+})

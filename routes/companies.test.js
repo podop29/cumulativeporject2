@@ -122,6 +122,28 @@ describe("GET /companies/:handle", function () {
         numEmployees: 1,
         logoUrl: "http://c1.img",
       },
+      "jobs": [
+        {
+          title: "TestJob",
+          salary: 60000,
+          equity: "0",
+          company_handle: "c1"
+      },
+      {
+      title: "TestJob2",
+      salary: 80000,
+      equity: null,
+      company_handle: "c1"
+      },
+      {
+          title: "TestJob3",
+          salary: 100000,
+          equity: "0.5",
+          company_handle: "c1"
+      }
+      ]
+
+      
     });
   });
 

@@ -43,6 +43,22 @@ const router = express.Router();
   }
 });
 
+/**Post create applications
+ * returns {username, jobid}
+ * Authorization required: login or admin
+ */
+router.post('/:username/jobs/:id', async (req,res,next)=>{
+  try{
+    const {username ,id} = req.params
+    const application = await User.apply(username,id)
+    return res.json({application});
+
+
+  }catch(e){
+    return next(e)
+  }
+})
+
 
 /** GET / => { users: [ {username, firstName, lastName, email }, ... ] }
  *
@@ -71,7 +87,10 @@ router.get("/", ensureAdmin, async function (req, res, next) {
 router.get("/:username", ensureCorrectUserOrAdmin, async function (req, res, next) {
   try {
     const user = await User.get(req.params.username);
-    return res.json({ user });
+    const jobs = await User.getJobsFor(req.params.username)
+    if(jobs[0]){return res.json({ user, jobs});}
+    return res.json({ user});
+
   } catch (err) {
     return next(err);
   }
